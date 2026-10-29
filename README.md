@@ -100,6 +100,16 @@ $env:DB_PASSWORD = "your-supabase-database-password"
 export DB_PASSWORD="your-supabase-database-password"
 ```
 
+Or create a `.env` file in the project root:
+
+```properties
+DB_URL=jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
+DB_USERNAME=postgres.mtpdfkyjrntiowofekwd
+DB_PASSWORD=your-supabase-database-password
+```
+
+The application loads `.env` automatically if it exists. The file is gitignored, so each developer keeps their own copy.
+
 Optional overrides:
 
 - `DB_URL` — full JDBC URL
