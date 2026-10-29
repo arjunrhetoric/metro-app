@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Route;
 import com.metro.ticketing.entity.RouteStation;
 import com.metro.ticketing.entity.Station;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Routes", description = "Manage routes and their ordered stops.")
 @RestController
 @RequestMapping("/api/routes")
 public class RouteController {
@@ -34,6 +38,7 @@ public class RouteController {
         this.stationRepository = stationRepository;
     }
 
+    @Operation(summary = "Create a route", description = "Creates a route with start/end stations and an optional ordered stop list. Admin only.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -49,6 +54,7 @@ public class RouteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(loadRoute(route.getRouteId()));
     }
 
+    @Operation(summary = "Update a route", description = "Updates route details and replaces its ordered stops. Admin only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -66,12 +72,14 @@ public class RouteController {
         return ResponseEntity.ok(loadRoute(id));
     }
 
+    @Operation(summary = "Get a route", description = "Returns a route with its ordered station IDs.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Route> getRouteById(@PathVariable String id) {
         return ResponseEntity.ok(loadRoute(id));
     }
 
+    @Operation(summary = "List all routes", description = "Returns every route with its ordered station IDs.")
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<List<Route>> getAllRoutes() {
@@ -80,6 +88,7 @@ public class RouteController {
         return ResponseEntity.ok(routes);
     }
 
+    @Operation(summary = "Delete a route", description = "Deletes a route and its stops. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

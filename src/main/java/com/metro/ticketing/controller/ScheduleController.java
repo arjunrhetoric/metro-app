@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Route;
 import com.metro.ticketing.entity.Schedule;
 import com.metro.ticketing.entity.Train;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Schedules", description = "Manage timetables and detect overlapping trips.")
 @RestController
 @RequestMapping("/api/schedules")
 public class ScheduleController {
@@ -32,6 +36,7 @@ public class ScheduleController {
         this.trainRepository = trainRepository;
     }
 
+    @Operation(summary = "Create a schedule", description = "Creates a timetable entry and rejects overlapping times for the same train. Admin only.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -48,6 +53,7 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleRepository.save(schedule));
     }
 
+    @Operation(summary = "Update a schedule", description = "Updates a schedule and rechecks train overlap. Admin only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -65,6 +71,7 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleRepository.save(schedule));
     }
 
+    @Operation(summary = "Get a schedule", description = "Returns one schedule by ID.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Schedule> getScheduleById(@PathVariable String id) {
@@ -73,12 +80,14 @@ public class ScheduleController {
         return ResponseEntity.ok(schedule);
     }
 
+    @Operation(summary = "List all schedules", description = "Returns every timetable entry.")
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<List<Schedule>> getAllSchedules() {
         return ResponseEntity.ok(scheduleRepository.findAll());
     }
 
+    @Operation(summary = "Delete a schedule", description = "Deletes a schedule by ID. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

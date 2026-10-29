@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Fare;
 import com.metro.ticketing.entity.Station;
 import com.metro.ticketing.entity.Ticket;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Tickets", description = "Book, view, validate and delete tickets.")
 @RestController
 @RequestMapping("/api/tickets")
 public class TicketController {
@@ -40,6 +44,7 @@ public class TicketController {
         this.fareRepository = fareRepository;
     }
 
+    @Operation(summary = "Book a ticket", description = "Creates a ticket for the authenticated passenger or a supplied passenger. Looks up the fare and defaults validity to 24 hours.")
     @PostMapping
     @PreAuthorize("hasAnyRole('PASSENGER', 'TICKET_AGENT', 'ADMIN')")
     @Transactional
@@ -86,6 +91,7 @@ public class TicketController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketRepository.save(ticket));
     }
 
+    @Operation(summary = "Get a ticket", description = "Returns one ticket. Passengers may only read their own tickets.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Ticket> getTicketById(@PathVariable String id, Authentication authentication) {
@@ -95,6 +101,7 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
+    @Operation(summary = "List all tickets", description = "Returns every ticket. Admin and ticket agents only.")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'TICKET_AGENT')")
     @Transactional(readOnly = true)
@@ -102,6 +109,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketRepository.findAll());
     }
 
+    @Operation(summary = "List a passenger's tickets", description = "Returns tickets for a passenger. Passengers are always limited to their own tickets.")
     @GetMapping("/passenger/{passengerId}")
     @Transactional(readOnly = true)
     public ResponseEntity<List<Ticket>> getTicketsByPassenger(@PathVariable String passengerId,
@@ -112,6 +120,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketRepository.findByPassenger_UserId(passengerId));
     }
 
+    @Operation(summary = "Use a ticket", description = "Marks a ticket as used after checking ownership, used status and expiry.")
     @PatchMapping("/{id}/use")
     @PreAuthorize("hasAnyRole('PASSENGER', 'TICKET_AGENT', 'ADMIN')")
     @Transactional
@@ -131,6 +140,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketRepository.save(ticket));
     }
 
+    @Operation(summary = "Delete a ticket", description = "Deletes a ticket if no payment references it. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

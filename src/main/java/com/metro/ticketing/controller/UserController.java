@@ -1,5 +1,7 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Role;
 import com.metro.ticketing.entity.Station;
 import com.metro.ticketing.entity.User;
@@ -45,6 +47,7 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(summary = "Create a user", description = "Admin creates a user with a chosen role. The password is BCrypt-hashed.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -89,6 +92,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    @Operation(summary = "List all users", description = "Returns every user. Admin only.")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
@@ -96,6 +100,7 @@ public class UserController {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
+    @Operation(summary = "Get a user", description = "Returns one user by ID. Admin only.")
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
@@ -105,6 +110,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @Operation(summary = "Update a user", description = "Partially updates user fields. Admin only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -150,6 +156,7 @@ public class UserController {
         return ResponseEntity.ok(updated);
     }
 
+    @Operation(summary = "Delete a user", description = "Deletes a user by ID. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

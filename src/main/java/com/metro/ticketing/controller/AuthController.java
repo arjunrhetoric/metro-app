@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Role;
 import com.metro.ticketing.entity.Station;
 import com.metro.ticketing.entity.User;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Tag(name = "Authentication", description = "Passenger registration, employee hiring and current-user details.")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -33,6 +37,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(summary = "Register a passenger", description = "Creates a passenger account with the PASSENGER role. Public endpoint; the password is BCrypt-hashed.")
     @PostMapping("/passenger/register")
     @Transactional
     @SecurityRequirements
@@ -54,6 +59,7 @@ public class AuthController {
         return ResponseEntity.ok(userRepository.save(user));
     }
 
+    @Operation(summary = "Hire an employee", description = "Creates a staff account and assigns it to a station. Admin only.")
     @PostMapping("/employee/hire")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -86,6 +92,7 @@ public class AuthController {
         return ResponseEntity.ok(userRepository.save(user));
     }
 
+    @Operation(summary = "Get current user", description = "Returns the user represented by the supplied Basic authentication credentials.")
     @GetMapping("/me")
     @Transactional(readOnly = true)
     public ResponseEntity<User> getCurrentUser(Authentication authentication) {

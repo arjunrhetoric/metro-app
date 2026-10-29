@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.MaintenanceIssue;
 import com.metro.ticketing.entity.Station;
 import com.metro.ticketing.entity.Train;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Maintenance", description = "Report, update, filter and resolve maintenance issues.")
 @RestController
 @RequestMapping("/api/maintenance")
 public class MaintenanceIssueController {
@@ -38,6 +42,7 @@ public class MaintenanceIssueController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Report an issue", description = "Creates a maintenance issue for a train, a station, or both, with priority and description.")
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MAINTENANCE_STAFF', 'TICKET_AGENT')")
     @Transactional
@@ -54,6 +59,7 @@ public class MaintenanceIssueController {
         return ResponseEntity.status(HttpStatus.CREATED).body(maintenanceIssueRepository.save(issue));
     }
 
+    @Operation(summary = "Update an issue", description = "Updates issue details, status, priority and optional links. Admin and maintenance staff only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MAINTENANCE_STAFF')")
     @Transactional
@@ -75,6 +81,7 @@ public class MaintenanceIssueController {
         return ResponseEntity.ok(maintenanceIssueRepository.save(issue));
     }
 
+    @Operation(summary = "Get an issue", description = "Returns one maintenance issue by ID.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<MaintenanceIssue> getMaintenanceIssueById(@PathVariable String id) {
@@ -83,6 +90,7 @@ public class MaintenanceIssueController {
         return ResponseEntity.ok(issue);
     }
 
+    @Operation(summary = "List all issues", description = "Returns every maintenance issue. Admin and maintenance staff only.")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MAINTENANCE_STAFF')")
     @Transactional(readOnly = true)
@@ -90,18 +98,21 @@ public class MaintenanceIssueController {
         return ResponseEntity.ok(maintenanceIssueRepository.findAll());
     }
 
+    @Operation(summary = "List issues for a train", description = "Returns maintenance issues linked to a train.")
     @GetMapping("/train/{trainId}")
     @Transactional(readOnly = true)
     public ResponseEntity<List<MaintenanceIssue>> getIssuesByTrain(@PathVariable String trainId) {
         return ResponseEntity.ok(maintenanceIssueRepository.findByTrain_TrainId(trainId));
     }
 
+    @Operation(summary = "List issues for a station", description = "Returns maintenance issues linked to a station.")
     @GetMapping("/station/{stationId}")
     @Transactional(readOnly = true)
     public ResponseEntity<List<MaintenanceIssue>> getIssuesByStation(@PathVariable String stationId) {
         return ResponseEntity.ok(maintenanceIssueRepository.findByStation_StationId(stationId));
     }
 
+    @Operation(summary = "Resolve an issue", description = "Marks an open issue Closed and records the resolution time. Admin and maintenance staff only.")
     @GetMapping("/status/{status}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MAINTENANCE_STAFF')")
     @Transactional(readOnly = true)
@@ -109,6 +120,7 @@ public class MaintenanceIssueController {
         return ResponseEntity.ok(maintenanceIssueRepository.findByStatus(status));
     }
 
+    @Operation(summary = "Resolve an issue", description = "Marks an open issue Closed and records the resolution time. Admin and maintenance staff only.")
     @PatchMapping("/{id}/resolve")
     @PreAuthorize("hasAnyRole('ADMIN', 'MAINTENANCE_STAFF')")
     @Transactional
@@ -125,6 +137,7 @@ public class MaintenanceIssueController {
         return ResponseEntity.ok(maintenanceIssueRepository.save(issue));
     }
 
+    @Operation(summary = "Delete an issue", description = "Deletes a maintenance issue by ID. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

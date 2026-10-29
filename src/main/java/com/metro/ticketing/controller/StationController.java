@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Station;
 import com.metro.ticketing.repository.StationRepository;
 import jakarta.validation.Valid;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Stations", description = "Create, read, update and delete metro stations.")
 @RestController
 @RequestMapping("/api/stations")
 public class StationController {
@@ -22,6 +26,7 @@ public class StationController {
         this.stationRepository = stationRepository;
     }
 
+    @Operation(summary = "Create a station", description = "Adds a new metro station. Admin only.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -32,6 +37,7 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(stationRepository.save(station));
     }
 
+    @Operation(summary = "Update a station", description = "Updates station details. Admin only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -42,6 +48,7 @@ public class StationController {
         return ResponseEntity.ok(stationRepository.save(station));
     }
 
+    @Operation(summary = "Get a station", description = "Returns one station by ID.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Station> getStationById(@PathVariable String id) {
@@ -50,12 +57,14 @@ public class StationController {
         return ResponseEntity.ok(station);
     }
 
+    @Operation(summary = "List all stations", description = "Returns all metro stations.")
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<List<Station>> getAllStations() {
         return ResponseEntity.ok(stationRepository.findAll());
     }
 
+    @Operation(summary = "Delete a station", description = "Deletes a station if no other records reference it. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

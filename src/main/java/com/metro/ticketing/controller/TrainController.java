@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Train;
 import com.metro.ticketing.repository.TrainRepository;
 import jakarta.validation.Valid;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Trains", description = "Manage the metro train fleet.")
 @RestController
 @RequestMapping("/api/trains")
 public class TrainController {
@@ -22,6 +26,7 @@ public class TrainController {
         this.trainRepository = trainRepository;
     }
 
+    @Operation(summary = "Create a train", description = "Adds a train to the fleet. Admin only.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -32,6 +37,7 @@ public class TrainController {
         return ResponseEntity.status(HttpStatus.CREATED).body(trainRepository.save(train));
     }
 
+    @Operation(summary = "Update a train", description = "Updates train details. Admin only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -42,6 +48,7 @@ public class TrainController {
         return ResponseEntity.ok(trainRepository.save(train));
     }
 
+    @Operation(summary = "Get a train", description = "Returns one train by ID.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Train> getTrainById(@PathVariable String id) {
@@ -50,12 +57,14 @@ public class TrainController {
         return ResponseEntity.ok(train);
     }
 
+    @Operation(summary = "List all trains", description = "Returns the complete fleet.")
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<List<Train>> getAllTrains() {
         return ResponseEntity.ok(trainRepository.findAll());
     }
 
+    @Operation(summary = "Delete a train", description = "Deletes a train if no schedules or issues reference it. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

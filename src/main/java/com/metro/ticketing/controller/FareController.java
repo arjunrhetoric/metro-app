@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Fare;
 import com.metro.ticketing.entity.Station;
 import com.metro.ticketing.repository.FareRepository;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Fares", description = "Manage the station-to-station fare matrix.")
 @RestController
 @RequestMapping("/api/fares")
 public class FareController {
@@ -26,6 +30,7 @@ public class FareController {
         this.stationRepository = stationRepository;
     }
 
+    @Operation(summary = "Create a fare", description = "Creates a directed fare for a station pair. Admin only.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -43,6 +48,7 @@ public class FareController {
         return ResponseEntity.status(HttpStatus.CREATED).body(fareRepository.save(fare));
     }
 
+    @Operation(summary = "Look up a fare", description = "Returns the fare for a source and destination station.")
     @GetMapping("/lookup")
     @Transactional(readOnly = true)
     public ResponseEntity<Fare> getFareByStations(@RequestParam String sourceStationId,
@@ -54,6 +60,7 @@ public class FareController {
         return ResponseEntity.ok(fare);
     }
 
+    @Operation(summary = "Get a fare", description = "Returns one fare by ID.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Fare> getFareById(@PathVariable String id) {
@@ -62,12 +69,14 @@ public class FareController {
         return ResponseEntity.ok(fare);
     }
 
+    @Operation(summary = "List all fares", description = "Returns the complete fare matrix.")
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<List<Fare>> getAllFares() {
         return ResponseEntity.ok(fareRepository.findAll());
     }
 
+    @Operation(summary = "Update a fare", description = "Updates a fare and checks station-pair uniqueness. Admin only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -86,6 +95,7 @@ public class FareController {
         return ResponseEntity.ok(fareRepository.save(fare));
     }
 
+    @Operation(summary = "Delete a fare", description = "Deletes a fare if no tickets reference it. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

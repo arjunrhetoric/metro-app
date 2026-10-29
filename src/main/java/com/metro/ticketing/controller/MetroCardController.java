@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.MetroCard;
 import com.metro.ticketing.entity.User;
 import com.metro.ticketing.repository.MetroCardRepository;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Metro Cards", description = "Issue, top up, deactivate and manage metro cards.")
 @RestController
 @RequestMapping("/api/cards")
 public class MetroCardController {
@@ -31,6 +35,7 @@ public class MetroCardController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Issue a metro card", description = "Issues a card. A passenger may only issue their own and may have one active card.")
     @PostMapping
     @PreAuthorize("hasAnyRole('PASSENGER', 'TICKET_AGENT', 'ADMIN')")
     @Transactional
@@ -64,6 +69,7 @@ public class MetroCardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(metroCardRepository.save(card));
     }
 
+    @Operation(summary = "Top up a metro card", description = "Adds an amount to a valid, active card. Passengers may only top up their own cards.")
     @PostMapping("/{id}/topup")
     @PreAuthorize("hasAnyRole('PASSENGER', 'TICKET_AGENT', 'ADMIN')")
     @Transactional
@@ -89,6 +95,7 @@ public class MetroCardController {
         return ResponseEntity.ok(metroCardRepository.save(card));
     }
 
+    @Operation(summary = "Get a metro card", description = "Returns one card. Passengers may only read their own cards.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<MetroCard> getMetroCardById(@PathVariable String id, Authentication authentication) {
@@ -98,6 +105,7 @@ public class MetroCardController {
         return ResponseEntity.ok(card);
     }
 
+    @Operation(summary = "List all metro cards", description = "Returns every card. Admin and ticket agents only.")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'TICKET_AGENT')")
     @Transactional(readOnly = true)
@@ -105,6 +113,7 @@ public class MetroCardController {
         return ResponseEntity.ok(metroCardRepository.findAll());
     }
 
+    @Operation(summary = "List a passenger's cards", description = "Returns cards for a passenger. Passengers are limited to their own cards.")
     @GetMapping("/passenger/{passengerId}")
     @Transactional(readOnly = true)
     public ResponseEntity<List<MetroCard>> getMetroCardsByPassenger(@PathVariable String passengerId,
@@ -115,6 +124,7 @@ public class MetroCardController {
         return ResponseEntity.ok(metroCardRepository.findByPassenger_UserId(passengerId));
     }
 
+    @Operation(summary = "Deactivate a metro card", description = "Marks a card inactive. Admin and ticket agents only.")
     @PatchMapping("/{id}/deactivate")
     @PreAuthorize("hasAnyRole('ADMIN', 'TICKET_AGENT')")
     @Transactional
@@ -125,6 +135,7 @@ public class MetroCardController {
         return ResponseEntity.ok(metroCardRepository.save(card));
     }
 
+    @Operation(summary = "Delete a metro card", description = "Deletes a card by ID. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional

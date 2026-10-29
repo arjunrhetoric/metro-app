@@ -1,5 +1,8 @@
 package com.metro.ticketing.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import com.metro.ticketing.entity.Payment;
 import com.metro.ticketing.entity.Ticket;
 import com.metro.ticketing.entity.User;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Payments", description = "Record and view payments for tickets.")
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -35,6 +39,7 @@ public class PaymentController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Create a payment", description = "Records payment for a ticket. The passenger must own the ticket and the amount must match the fare.")
     @PostMapping
     @PreAuthorize("hasAnyRole('PASSENGER', 'TICKET_AGENT')")
     @Transactional
@@ -63,6 +68,7 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentRepository.save(payment));
     }
 
+    @Operation(summary = "Get a payment", description = "Returns one payment. Passengers may only read payments for their own tickets.")
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Payment> getPaymentById(@PathVariable String id, Authentication authentication) {
@@ -72,6 +78,7 @@ public class PaymentController {
         return ResponseEntity.ok(payment);
     }
 
+    @Operation(summary = "List all payments", description = "Returns every payment. Admin and ticket agents only.")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'TICKET_AGENT')")
     @Transactional(readOnly = true)
@@ -79,6 +86,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentRepository.findAll());
     }
 
+    @Operation(summary = "List payments for a ticket", description = "Returns payments for one ticket. Passengers may only view their own.")
     @GetMapping("/ticket/{ticketId}")
     @Transactional(readOnly = true)
     public ResponseEntity<List<Payment>> getPaymentsByTicket(@PathVariable String ticketId,
@@ -94,6 +102,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentRepository.findByTicket_TicketId(ticketId));
     }
 
+    @Operation(summary = "Delete a payment", description = "Deletes a payment by ID. Admin only.")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
