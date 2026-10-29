@@ -295,7 +295,6 @@ import java.util.Optional;                                    // Empty-or-value 
 @Repository                                                   // Spring creates the implementation.
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByContact(String contact);             // SELECT ... WHERE "Contact" = ?
-    boolean existsByContact(String contact);                  // Unused today.
 }
 ```
 

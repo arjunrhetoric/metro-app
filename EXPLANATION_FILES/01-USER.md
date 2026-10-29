@@ -253,22 +253,7 @@ public class User {                                               // One User ob
     private String stationId;                                     // Temporary holder used only while reading a request.
 
     public User() {                                               // No-argument constructor.
-    }                                                             // Required by JPA and Jackson.
-
-    public User(String userId, String firstName, String lastName, String password, Role role,
-                String contact, LocalDate registrationDate, Boolean isActive,
-                LocalDate hireDate, Station station) {            // All-arguments constructor.
-        this.userId = userId;                                     // Copy each parameter into the field.
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.role = role;
-        this.contact = contact;
-        this.registrationDate = registrationDate;
-        this.isActive = isActive;
-        this.hireDate = hireDate;
-        this.station = station;
-    }                                                             // The controllers actually use the no-arg constructor.
+    }                                                             // Required by JPA and Jackson; controllers also use it.
 
     @PrePersist                                                   // Called by JPA just before INSERT.
     public void onCreate() {                                      // Safety net for values that must exist.
@@ -446,7 +431,6 @@ import java.util.Optional;                                    // May contain a U
 public interface UserRepository extends JpaRepository<User, String> {
                                                               // <User, String>: entity is User, PK type is String.
     Optional<User> findByContact(String contact);             // SELECT ... WHERE "Contact" = ?
-    boolean existsByContact(String contact);                  // Fast "does this contact exist?" check.
 }
 ```
 
@@ -458,12 +442,11 @@ There is **no class** and **no SQL**. At startup Spring Data JPA:
 4. Registers it as a bean named `userRepository`.
 5. Reads `findByContact` and builds a query from the method name.
 
-### 6.1 The two declared methods
+### 6.1 The declared method
 
 | Method | Generated SQL (simplified) | Returns | Used by |
 |---|---|---|---|
 | `findByContact(String contact)` | `SELECT * FROM "User" WHERE "Contact" = ?` | `Optional<User>` | register, hire, login, `/me`, ownership checks |
-| `existsByContact(String contact)` | `SELECT count(*) > 0 FROM "User" WHERE "Contact" = ?` | `boolean` | declared but not called today |
 
 Why `Optional`? Because the contact might not exist. `Optional` forces the caller to decide what to do instead of risking a `NullPointerException`.
 
@@ -497,16 +480,6 @@ if (userRepository.findByContact(contact).isPresent()) { ... }
 ### 6.3 What `save` returns
 
 `save` returns the managed entity. After an INSERT, the returned object contains whatever the database generated. Here the ID is generated in Java, so the returned object is essentially the same object, now managed by the persistence context.
-
-### 6.4 A note on `existsByContact`
-
-It is unused but harmless. If you wanted to simplify the duplicate check, you could write:
-
-```java
-if (userRepository.existsByContact(request.getContact())) { ... }
-```
-
-That avoids loading the whole row when you only need a yes/no answer.
 
 ---
 
@@ -1118,8 +1091,8 @@ The table name needs literal double quotes. In a Java string, `\"` means a doubl
 **Q3. Where is the `CREATE TABLE` in the Java code?**
 Nowhere. Flyway runs the SQL file. Hibernate only validates that the entity matches the table (`ddl-auto=validate`).
 
-**Q4. Why does the class have two constructors?**
-JPA needs the empty constructor to create objects when loading rows. The all-arguments constructor is convenient for tests or manual creation. The controllers use the empty one and call setters.
+**Q4. Why does the class have an empty constructor?**
+JPA needs it to create objects when loading rows. The controllers also use it and then call setters to fill the fields.
 
 **Q5. Why are getters and setters written by hand?**
 The project does not use Lombok. Writing them makes the behaviour visible and avoids an extra dependency.

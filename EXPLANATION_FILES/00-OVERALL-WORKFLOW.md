@@ -409,7 +409,6 @@ import java.util.Optional;                                 // A box that may hol
 public interface UserRepository extends JpaRepository<User, String> {
                                                            // User = entity type, String = type of the primary key.
     Optional<User> findByContact(String contact);          // Spring writes: WHERE "Contact" = ?
-    boolean existsByContact(String contact);               // Spring writes a fast "does a row exist?" query.
 }
 ```
 
@@ -435,8 +434,6 @@ Because the controllers assign the ID **before** calling `save`, Spring Data can
 2. Hire: same check for employees.
 3. Login: `DbUserDetailsService` loads the user by contact.
 4. `/api/auth/me`: finds the profile of the logged-in user.
-
-`existsByContact` is declared but no controller calls it today. It is a shorter alternative to `findByContact(...).isPresent()`.
 
 ---
 

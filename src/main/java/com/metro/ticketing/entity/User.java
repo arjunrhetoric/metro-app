@@ -73,20 +73,6 @@ public class User {
     public User() {
     }
 
-    public User(String userId, String firstName, String lastName, String password, Role role,
-                String contact, LocalDate registrationDate, Boolean isActive, LocalDate hireDate, Station station) {
-        this.userId = userId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.role = role;
-        this.contact = contact;
-        this.registrationDate = registrationDate;
-        this.isActive = isActive;
-        this.hireDate = hireDate;
-        this.station = station;
-    }
-
     @PrePersist
     public void onCreate() {
         if (this.userId == null && this.role != null) {
